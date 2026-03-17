@@ -97,168 +97,134 @@ begin
 
     sim_proc : process
     begin
-        -- Reset first
-        w_reset <= '1';
-        w_left  <= '0';
-        w_right <= '0';
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "000")
-            report "bad reset: lights should be off"
-            severity failure;
+    w_reset <= '1';
+    w_left  <= '0';
+    w_right <= '0';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "bad reset: lights should be off" severity failure;
 
-        w_reset <= '0';
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "000")
-            report "after reset release, FSM should remain off with no inputs"
-            severity failure;
+    w_reset <= '0';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "after reset release, FSM should remain off with no inputs" severity failure;
 
-        w_left <= '1';
-        wait for k_clk_period;
-        assert (w_lights_L = "001" and w_lights_R = "000")
-            report "left step 1 failed"
-            severity failure;
+    w_left <= '1';
+    wait for k_clk_period;
+    assert (w_lights_L = "001" and w_lights_R = "000") report "left step 1 failed" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "011" and w_lights_R = "000")
-            report "left step 2 failed"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "011" and w_lights_R = "000") report "left step 2 failed" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "111" and w_lights_R = "000")
-            report "left step 3 failed"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "111" and w_lights_R = "000") report "left step 3 failed" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "000")
-            report "left off step failed"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "left off step failed" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "001" and w_lights_R = "000")
-            report "left repeat failed"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "001" and w_lights_R = "000") report "left repeat failed" severity failure;
 
-        w_reset <= '1';
-        wait for k_clk_period;
-        w_reset <= '0';
-        wait for k_clk_period;
 
-        w_left <= '1';
-        wait for k_clk_period;
-        assert (w_lights_L = "001" and w_lights_R = "000")
-            report "left early-release step 1 failed"
-            severity failure;
+    w_left  <= '0';
+    w_right <= '0';
+    w_reset <= '1';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "reset failed before left early-release test" severity failure;
 
-        w_left <= '0';
-        wait for k_clk_period;
-        assert (w_lights_L = "011" and w_lights_R = "000")
-            report "left did not continue after release"
-            severity failure;
+    w_reset <= '0';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "FSM not off before left early-release test" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "111" and w_lights_R = "000")
-            report "left step 3 failed after release"
-            severity failure;
+    w_left <= '1';
+    wait for k_clk_period;
+    assert (w_lights_L = "001" and w_lights_R = "000") report "left early-release step 1 failed" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "000")
-            report "left did not return to off"
-            severity failure;
+    w_left <= '0';
+    wait for k_clk_period;
+    assert (w_lights_L = "011" and w_lights_R = "000") report "left did not continue after release" severity failure;
 
-        w_right <= '1';
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "001")
-            report "right step 1 failed"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "111" and w_lights_R = "000") report "left step 3 failed after release" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "011")
-            report "right step 2 failed"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "left did not return to off" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "111")
-            report "right step 3 failed"
-            severity failure;
+    w_right <= '1';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "001") report "right step 1 failed" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "000")
-            report "right off step failed"
-            severity failure;
-        w_reset <= '1';
-        wait for k_clk_period;
-        w_reset <= '0';
-        wait for k_clk_period;
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "011") report "right step 2 failed" severity failure;
 
-        w_right <= '1';
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "001")
-            report "right early-release step 1 failed"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "111") report "right step 3 failed" severity failure;
 
-        w_right <= '0';
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "011")
-            report "right did not continue after release"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "right off step failed" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "111")
-            report "right step 3 failed after release"
-            severity failure;
+    w_left  <= '0';
+    w_right <= '0';
+    w_reset <= '1';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "reset failed before right early-release test" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "000")
-            report "right did not return to off"
-            severity failure;
-        w_left  <= '1';
-        w_right <= '1';
-        wait for k_clk_period;
-        assert (w_lights_L = "111" and w_lights_R = "111")
-            report "hazard on failed"
-            severity failure;
+    w_reset <= '0';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "FSM not off before right early-release test" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "000")
-            report "hazard off failed"
-            severity failure;
+    w_right <= '1';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "001") report "right early-release step 1 failed" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "111" and w_lights_R = "111")
-            report "hazard repeat failed"
-            severity failure;
-        w_reset <= '1';
-        wait for k_clk_period;
-        w_reset <= '0';
-        w_left  <= '1';
-        w_right <= '0';
-        wait for k_clk_period;
-        assert (w_lights_L = "001" and w_lights_R = "000")
-            report "mid-pattern test step 1 failed"
-            severity failure;
+    w_right <= '0';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "011") report "right did not continue after release" severity failure;
 
-        w_right <= '1';
-        wait for k_clk_period;
-        assert (w_lights_L = "011" and w_lights_R = "000")
-            report "left sequence interrupted"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "111") report "right step 3 failed after release" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "111" and w_lights_R = "000")
-            report "left step 3 interrupted"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "right did not return to off" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "000" and w_lights_R = "000")
-            report "left sequence did not finish"
-            severity failure;
+    w_left  <= '1';
+    w_right <= '1';
+    wait for k_clk_period;
+    assert (w_lights_L = "111" and w_lights_R = "111") report "hazard on failed" severity failure;
 
-        wait for k_clk_period;
-        assert (w_lights_L = "111" and w_lights_R = "111")
-            report "hazard did not begin after return to off"
-            severity failure;
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "hazard off failed" severity failure;
 
-        wait;
+    wait for k_clk_period;
+    assert (w_lights_L = "111" and w_lights_R = "111") report "hazard repeat failed" severity failure;
+
+    w_left  <= '0';
+    w_right <= '0';
+    w_reset <= '1';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "reset failed before mid-pattern test" severity failure;
+
+    w_reset <= '0';
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "FSM not off before mid-pattern test" severity failure;
+
+    w_left  <= '1';
+    w_right <= '0';
+    wait for k_clk_period;
+    assert (w_lights_L = "001" and w_lights_R = "000") report "mid-pattern test step 1 failed" severity failure;
+
+    w_right <= '1';
+    wait for k_clk_period;
+    assert (w_lights_L = "011" and w_lights_R = "000") report "left sequence interrupted" severity failure;
+
+    wait for k_clk_period;
+    assert (w_lights_L = "111" and w_lights_R = "000") report "left step 3 interrupted" severity failure;
+
+    wait for k_clk_period;
+    assert (w_lights_L = "000" and w_lights_R = "000") report "left sequence did not finish" severity failure;
+
+    wait for k_clk_period;
+    assert (w_lights_L = "111" and w_lights_R = "111") report "hazard did not begin after return to off" severity failure;
+
+    wait;
     end process;
 	
 end test_bench;
