@@ -36,18 +36,18 @@
 --|					can be changed by the inputs
 --|					
 --|
---|                 xxx State Encoding key
+--|                 One-Hot State Encoding key
 --|                 --------------------
 --|                  State | Encoding
 --|                 --------------------
---|                  OFF   | 
---|                  ON    | 
---|                  R1    | 
---|                  R2    | 
---|                  R3    | 
---|                  L1    | 
---|                  L2    | 
---|                  L3    | 
+--|                  OFF   | 0000001
+--|                  ON    | 1000010
+--|                  R1    | 0001000
+--|                  R2    | 0010000
+--|                  R3    | 0100000
+--|                  L1    | 0000010
+--|                  L2    | 0000100
+--|                  L3    | 1001000
 --|                 --------------------
 --|
 --|
@@ -86,23 +86,66 @@ library ieee;
   use ieee.numeric_std.all;
  
 entity thunderbird_fsm is 
---  port(
-	
---  );
+    port (
+        i_clk, i_reset  : in    std_logic;
+        i_left, i_right : in    std_logic;
+        o_lights_L      : out   std_logic_vector(2 downto 0);
+        o_lights_R      : out   std_logic_vector(2 downto 0)
+    );
 end thunderbird_fsm;
 
 architecture thunderbird_fsm_arch of thunderbird_fsm is 
 
+
 -- CONSTANTS ------------------------------------------------------------------
+    constant S0_OFF : std_logic_vector(7 downto 0) := "00000001";
+    constant S1_L1  : std_logic_vector(7 downto 0) := "00000010";
+    constant S2_L2  : std_logic_vector(7 downto 0) := "00000100";
+    constant S3_L3  : std_logic_vector(7 downto 0) := "00001000";
+    constant S4_R1  : std_logic_vector(7 downto 0) := "00010000";
+    constant S5_R2  : std_logic_vector(7 downto 0) := "00100000";
+    constant S6_R3  : std_logic_vector(7 downto 0) := "01000000";
+    constant S7_HAZ : std_logic_vector(7 downto 0) := "10000000";
+
+    signal r_state      : std_logic_vector(7 downto 0) := S0_OFF;
+    signal w_next_state : std_logic_vector(7 downto 0);
+
+    signal w_LA, w_LB, w_LC : std_logic;
+    signal w_RA, w_RB, w_RC : std_logic;
   
 begin
 
-	-- CONCURRENT STATEMENTS --------------------------------------------------------	
+	-- CONCURRENT STATEMENTS --------------------------------------------------------
+	w_next_state(0) <= (r_state(0) and (not (i_left or i_right))) or r_state(3) or r_state(6) or r_state(7);
+	w_next_state(1) <= r_state(0) and i_left and (not i_right);
+	w_next_state(2) <= r_state(1);
+	w_next_state(3) <= r_state(2);
+	w_next_state(4) <= r_state(0) and (not i_left) and i_right;
+	w_next_state(5) <= r_state(4);
+	w_next_state(7) <= r_state(0) and i_left and i_right;
+	w_LA <= r_state(1) or r_state(2) or r_state(3) or r_state(7);
+    w_LB <= r_state(2) or r_state(3) or r_state(7);
+    w_LC <= r_state(3) or r_state(7);
+    w_RA <= r_state(4) or r_state(5) or r_state(6) or r_state(7);
+    w_RB <= r_state(5) or r_state(6) or r_state(7);
+    w_RC <= r_state(6) or r_state(7);
+    o_lights_L <= w_LC & w_LB & w_LA;
+    o_lights_R <= w_RC & w_RB & w_RA;
 	
     ---------------------------------------------------------------------------------
 	
 	-- PROCESSES --------------------------------------------------------------------
-    
-	-----------------------------------------------------					   
+    process(i_clk)
+    begin
+        if rising_edge(i_clk) then
+            if i_reset = '1' then
+                r_state <= S0_OFF;
+            else
+                r_state <= w_next_state;
+            end if;
+        end if;
+    end process;
+			
+				   
 				  
 end thunderbird_fsm_arch;
